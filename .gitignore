@@ -5,5 +5,7 @@ DOCUMENTATION.md
 
 # Build & OS artifacts
 public/
+.cache/
+.quartz_build/
 .DS_Store
 .obsidian/workspace*
