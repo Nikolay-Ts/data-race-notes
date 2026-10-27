@@ -1,0 +1,46 @@
+image: node:22
+
+pages:
+  stage: deploy
+  script:
+    - git clone --depth 1 --branch v4 https://github.com/jackyzha0/quartz.git /tmp/quartz
+    - cd /tmp/quartz && npm ci
+    - rm -rf /tmp/quartz/content/*
+    - |
+      tar -C "$CI_PROJECT_DIR" \
+        --exclude='./.git' \
+        --exclude='./.gitignore' \
+        --exclude='./.gitlab-ci.yml' \
+        --exclude='./publish.sh' \
+        --exclude='./public' \
+        --exclude='./documentation.md' \
+        --exclude='./Documentation.md' \
+        --exclude='./DOCUMENTATION.md' \
+        -cf - . | tar -C /tmp/quartz/content -xf -
+    - |
+      if [ ! -f /tmp/quartz/content/index.md ]; then
+        echo "---" > /tmp/quartz/content/index.md
+        echo "title: Data Races Notes" >> /tmp/quartz/content/index.md
+        echo "---" >> /tmp/quartz/content/index.md
+        echo "" >> /tmp/quartz/content/index.md
+        echo "# Data Races Notes" >> /tmp/quartz/content/index.md
+        echo "" >> /tmp/quartz/content/index.md
+        find /tmp/quartz/content -maxdepth 2 -name "*.md" ! -name "index.md" | sort | while read -r file; do
+          rel="${file#/tmp/quartz/content/}"
+          note="${rel%.md}"
+          echo "- [[${note}]]" >> /tmp/quartz/content/index.md
+        done
+      fi
+    - |
+      BASE_URL="${CI_PAGES_URL#https://}"
+      BASE_URL="${BASE_URL#http://}"
+      sed -i 's/pageTitle: ".*"/pageTitle: "Data Races Notes"/' /tmp/quartz/quartz.config.ts
+      if [ -n "$BASE_URL" ]; then
+        sed -i "s|baseUrl: \".*\"|baseUrl: \"$BASE_URL\"|" /tmp/quartz/quartz.config.ts
+      fi
+    - npx quartz build -o "$CI_PROJECT_DIR/public"
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH

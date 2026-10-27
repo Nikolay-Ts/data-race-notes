@@ -1,0 +1,9 @@
+# Ignore documentation markdown file
+documentation.md
+Documentation.md
+DOCUMENTATION.md
+
+# Build & OS artifacts
+public/
+.DS_Store
+.obsidian/workspace*
