@@ -9,7 +9,7 @@ if [ ! -d ".git" ]; then
   git init -b main
 fi
 
-DEFAULT_REMOTE="git@gitlabense.imtbs-tsp.eu:data-race/notes.git"
+DEFAULT_REMOTE="git@github.com:Nikolay-Ts/data-race-notes.git"
 
 # Configure remote if passed as an argument or if missing
 if [ "${1:-}" != "" ] && [[ "${1:-}" == http* || "${1:-}" == git@* ]]; then
@@ -37,4 +37,4 @@ fi
 
 BRANCH="$(git branch --show-current)"
 git push -u origin "$BRANCH"
-echo "Published! GitLab CI is now building and deploying your Quartz site."
+echo "Published! GitHub Actions is now building and deploying your Quartz site."

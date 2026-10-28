@@ -62,13 +62,14 @@ The compiler uses `generic` addresses, when it cannot disambiguate the memory sp
 
 ```
 // universal lost update 
-write.globa [%addr] = vr0 // original store
+write.global [%addr] = vr0 // original store
 nanosleep.rand // shuffle warps
 read.global.sys.strong vr1 [%addr]
 if vr0 != vr1 {
 	notify lost update
 }
 ```
+
 
 This is what the compiler inserts for weak write operations to the global, shared or generic memory space. It  mirrors the instrumentation for reads, but the approach checks whether another thread overwrites this thread's update. 
 

@@ -1,0 +1,118 @@
+name: Deploy Quartz Site to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout Notes Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Clone and Install Quartz v4
+        run: |
+          QUARTZ_DIR="$RUNNER_TEMP/quartz"
+          rm -rf "$QUARTZ_DIR"
+          git clone --depth 1 --branch v4 https://github.com/jackyzha0/quartz.git "$QUARTZ_DIR"
+          cd "$QUARTZ_DIR"
+          npm ci
+
+      - name: Populate Content and Build Site
+        run: |
+          QUARTZ_DIR="$RUNNER_TEMP/quartz"
+          rm -rf "$QUARTZ_DIR/content/"*
+
+          tar -C "$GITHUB_WORKSPACE" \
+            --exclude='./.git' \
+            --exclude='./.github' \
+            --exclude='./.gitignore' \
+            --exclude='./.gitlab-ci.yml' \
+            --exclude='./.cache' \
+            --exclude='./.quartz_build' \
+            --exclude='./publish.sh' \
+            --exclude='./public' \
+            --exclude='./documentation.md' \
+            --exclude='./Documentation.md' \
+            --exclude='./DOCUMENTATION.md' \
+            -cf - . | tar -C "$QUARTZ_DIR/content" -xf -
+
+          if [ ! -f "$QUARTZ_DIR/content/index.md" ]; then
+            {
+              echo "---"
+              echo "title: Data Races Notes"
+              echo "---"
+              echo ""
+              echo "# Data Races Notes"
+              echo ""
+              echo "## Literature Notes"
+              find "$QUARTZ_DIR/content/lit-notes" -type f -name "*.md" 2>/dev/null | sort | while read -r file; do
+                rel="${file#$QUARTZ_DIR/content/}"
+                note="${rel%.md}"
+                echo "- [[${note}]]"
+              done
+              echo ""
+              echo "## Meeting Notes"
+              find "$QUARTZ_DIR/content/Meeting-notes" -type f -name "*.md" 2>/dev/null | sort | while read -r file; do
+                rel="${file#$QUARTZ_DIR/content/}"
+                note="${rel%.md}"
+                echo "- [[${note}]]"
+              done
+              echo ""
+              echo "## Sources"
+              find "$QUARTZ_DIR/content/sources" -type f -name "*.md" 2>/dev/null | sort | while read -r file; do
+                rel="${file#$QUARTZ_DIR/content/}"
+                note="${rel%.md}"
+                echo "- [[${note}]]"
+              done
+            } > "$QUARTZ_DIR/content/index.md"
+          fi
+
+          REPO_OWNER="$(echo "${GITHUB_REPOSITORY_OWNER}" | tr '[:upper:]' '[:lower:]')"
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          BASE_URL="${REPO_OWNER}.github.io/${REPO_NAME}"
+
+          sed -i 's/pageTitle: ".*"/pageTitle: "Data Races Notes"/' "$QUARTZ_DIR/quartz.config.ts"
+          sed -i "s|baseUrl: \".*\"|baseUrl: \"$BASE_URL\"|" "$QUARTZ_DIR/quartz.config.ts"
+
+          cd "$QUARTZ_DIR"
+          npx quartz build -o "$GITHUB_WORKSPACE/public"
+          touch "$GITHUB_WORKSPACE/public/.nojekyll"
+
+      - name: Deploy to gh-pages branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+
+      - name: Deploy to GitHub Pages (Actions)
+        id: deployment
+        continue-on-error: true
+        uses: actions/deploy-pages@v4
