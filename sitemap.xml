@@ -1,112 +1,148 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml"><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/Meeting-notes/26.10.14</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/Meeting-notes/26.10.20</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/</loc>
-    <lastmod>2026-10-28T09:16:02.305Z</lastmod>
+    <lastmod>2026-10-29T19:52:20.940Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/CPU-Inter-Process-Communication</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Cache-Coherence</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Coherence-Basics</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Cooperative-Groups</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Cuda-Events</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Independent-Thread-Scheduling</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Instruction-Set-Architecture</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Unified-Memory-Programming</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/memory/CUDA-Programming-Model</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/memory/CUDA-Runtime</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/memory/GPU-Memory-Consistency</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/memory/Relaxed-Memory-Consistency</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/memory/SWMR-Memory-Consistency-Model</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
+  </url><url>
+    <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/patching/NVBit-API</loc>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/patching/NVBit</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/Compute-Sanitizer</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/Eraser</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/FastTrack</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/Happens-Before-Relation</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/HiRace</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/Lockset-Algorithm</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
+  </url><url>
+    <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/PreDataR</loc>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/Predictive-Data-Race-Detection-for-GPUS</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
+  </url><url>
+    <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/RaceCheck</loc>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/ScoRD</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/Super-Collider</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
+  </url><url>
+    <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/Synccheck</loc>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/lit-notes/races/iGuard</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/CUDA_C_Programming_Guide</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
+  </url><url>
+    <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/Computer-Sanitizer</loc>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/Cooperative-Groups</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
+  </url><url>
+    <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/DataCollider</loc>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/HiRace</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/Independent-Thread-scheduling</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/MICRO_2019_NVBit</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
+  </url><url>
+    <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/Me</loc>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/SOSP21_iGUARD</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
+  </url><url>
+    <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/asplos21_predatar</loc>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
+  </url><url>
+    <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/eraser</loc>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/fast-track</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/inter-process_communication_in_linux</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
+  </url><url>
+    <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/isca20_ScoRD</loc>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/primer2020_2nd_edition</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
+  </url><url>
+    <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/sc24_hirace</loc>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url><url>
     <loc>https://nikolay-ts.github.io/data-race-notes/sources/md/super-collider</loc>
-    <lastmod>2026-10-28T09:15:51.000Z</lastmod>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
+  </url><url>
+    <loc>https://nikolay-ts.github.io/data-race-notes/thoughts/Comparing-Different-Data-Race-Detectors</loc>
+    <lastmod>2026-10-29T19:52:10.000Z</lastmod>
   </url></urlset>

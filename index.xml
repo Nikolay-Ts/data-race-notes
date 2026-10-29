@@ -10,61 +10,61 @@
     <link>https://nikolay-ts.github.io/data-race-notes/</link>
     <guid>https://nikolay-ts.github.io/data-race-notes/</guid>
     <description><![CDATA[ Data Races Notes Literature Notes CPU Inter-Process-Communication Cache Coherence Coherence Basics Cooperative Groups Cuda Events Independent Thread Scheduling Instruction Set Architecture Unified Memory Programming CUDA Programming Model CUDA Runtime GPU Memory Consistency Relaxed Memory Consistenc... ]]></description>
-    <pubDate>Wed, 28 Oct 2026 09:16:02 GMT</pubDate>
+    <pubDate>Thu, 29 Oct 2026 19:52:20 GMT</pubDate>
   </item><item>
     <title>26.10.14</title>
     <link>https://nikolay-ts.github.io/data-race-notes/Meeting-notes/26.10.14</link>
     <guid>https://nikolay-ts.github.io/data-race-notes/Meeting-notes/26.10.14</guid>
     <description><![CDATA[ We focus on shared memory not global NVSHMEM is difficult, some are easier we want to use it to warn when you find the data races. ]]></description>
-    <pubDate>Wed, 28 Oct 2026 09:15:51 GMT</pubDate>
+    <pubDate>Thu, 29 Oct 2026 19:52:10 GMT</pubDate>
   </item><item>
     <title>26.10.20</title>
     <link>https://nikolay-ts.github.io/data-race-notes/Meeting-notes/26.10.20</link>
     <guid>https://nikolay-ts.github.io/data-race-notes/Meeting-notes/26.10.20</guid>
     <description><![CDATA[ Keep the wiki update too early too talk about the project Talk about the GPU architecture and help me understand it undefined behavoiur != race condtiion clusters is a new features which can join CTA cooperative thread array, put few SMs into the cluster. ]]></description>
-    <pubDate>Wed, 28 Oct 2026 09:15:51 GMT</pubDate>
+    <pubDate>Thu, 29 Oct 2026 19:52:10 GMT</pubDate>
   </item><item>
     <title>CPU Inter-Process-Communication</title>
     <link>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/CPU-Inter-Process-Communication</link>
     <guid>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/CPU-Inter-Process-Communication</guid>
     <description><![CDATA[ inter-process_communication_in_linux IPC CPU Shared Storage Shared files might be the most basic method of IPC. ]]></description>
-    <pubDate>Wed, 28 Oct 2026 09:15:51 GMT</pubDate>
+    <pubDate>Thu, 29 Oct 2026 19:52:10 GMT</pubDate>
   </item><item>
     <title>Cache Coherence</title>
     <link>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Cache-Coherence</link>
     <guid>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Cache-Coherence</guid>
     <description><![CDATA[ cache-coherence CPU Intro When having a multi-core architecture you have several cores that shared a variable but still have their own cache. ]]></description>
-    <pubDate>Wed, 28 Oct 2026 09:15:51 GMT</pubDate>
+    <pubDate>Thu, 29 Oct 2026 19:52:10 GMT</pubDate>
   </item><item>
     <title>Coherence Basics</title>
     <link>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Coherence-Basics</link>
     <guid>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Coherence-Basics</guid>
     <description><![CDATA[ cache-coherence CPU primer2020_2nd_edition Baseline System Model We consider a system with multiple processors and a shared memory. ]]></description>
-    <pubDate>Wed, 28 Oct 2026 09:15:51 GMT</pubDate>
+    <pubDate>Thu, 29 Oct 2026 19:52:10 GMT</pubDate>
   </item><item>
     <title>Cooperative Groups</title>
     <link>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Cooperative-Groups</link>
     <guid>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Cooperative-Groups</guid>
     <description><![CDATA[ cuda Cooperative Groups read this . ]]></description>
-    <pubDate>Wed, 28 Oct 2026 09:15:51 GMT</pubDate>
+    <pubDate>Thu, 29 Oct 2026 19:52:10 GMT</pubDate>
   </item><item>
     <title>Cuda Events</title>
     <link>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Cuda-Events</link>
     <guid>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Cuda-Events</guid>
     <description><![CDATA[  ]]></description>
-    <pubDate>Wed, 28 Oct 2026 09:15:51 GMT</pubDate>
+    <pubDate>Thu, 29 Oct 2026 19:52:10 GMT</pubDate>
   </item><item>
     <title>Independent Thread Scheduling</title>
     <link>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Independent-Thread-Scheduling</link>
     <guid>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Independent-Thread-Scheduling</guid>
     <description><![CDATA[ cuda Independent Thread scheduling read this 🔽 . ]]></description>
-    <pubDate>Wed, 28 Oct 2026 09:15:51 GMT</pubDate>
+    <pubDate>Thu, 29 Oct 2026 19:52:10 GMT</pubDate>
   </item><item>
     <title>Instruction Set Architecture</title>
     <link>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Instruction-Set-Architecture</link>
     <guid>https://nikolay-ts.github.io/data-race-notes/lit-notes/general/Instruction-Set-Architecture</guid>
     <description><![CDATA[  ]]></description>
-    <pubDate>Wed, 28 Oct 2026 09:15:51 GMT</pubDate>
+    <pubDate>Thu, 29 Oct 2026 19:52:10 GMT</pubDate>
   </item>
     </channel>
   </rss>

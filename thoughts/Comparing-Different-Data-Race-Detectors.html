@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr"><head><title>Comparing Different Data-Race Detectors</title><meta charset="utf-8"/><link rel="preconnect" href="https://fonts.googleapis.com"/><link rel="preconnect" href="https://fonts.gstatic.com"/><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted Grotesk:wght@400;700&amp;family=Source Sans Pro:ital,wght@0,400;0,600;1,400;1,600&amp;family=IBM Plex Mono:wght@400;600&amp;display=swap"/><link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin="anonymous"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><meta name="og:site_name" content="Data Races Notes"/><meta property="og:title" content="Comparing Different Data-Race Detectors"/><meta property="og:type" content="website"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Comparing Different Data-Race Detectors"/><meta name="twitter:description" content="thoughts data-race Recap Eraser is the founder of them all and was the first to use the Happens-Before Relation."/><meta property="og:description" content="thoughts data-race Recap Eraser is the founder of them all and was the first to use the Happens-Before Relation."/><meta property="og:image:alt" content="thoughts data-race Recap Eraser is the founder of them all and was the first to use the Happens-Before Relation."/><meta property="twitter:domain" content="nikolay-ts.github.io/data-race-notes"/><meta property="og:url" content="https://nikolay-ts.github.io/data-race-notes/thoughts/Comparing-Different-Data-Race-Detectors"/><meta property="twitter:url" content="https://nikolay-ts.github.io/data-race-notes/thoughts/Comparing-Different-Data-Race-Detectors"/><link rel="icon" href="../static/icon.png"/><meta name="description" content="thoughts data-race Recap Eraser is the founder of them all and was the first to use the Happens-Before Relation."/><meta name="generator" content="Quartz"/><link href="../index.css" rel="stylesheet" type="text/css" data-persist="true"/><style>.expand-button {
+  position: absolute;
+  display: flex;
+  float: right;
+  padding: 0.4rem;
+  margin: 0.3rem;
+  right: 0;
+  color: var(--gray);
+  border-color: var(--dark);
+  background-color: var(--light);
+  border: 1px solid;
+  border-radius: 5px;
+  opacity: 0;
+  transition: 0.2s;
+}
+.expand-button > svg {
+  fill: var(--light);
+  filter: contrast(0.3);
+}
+.expand-button:hover {
+  cursor: pointer;
+  border-color: var(--secondary);
+}
+.expand-button:focus {
+  outline: 0;
+}
+
+pre:hover > .expand-button {
+  opacity: 1;
+  transition: 0.2s;
+}
+
+#mermaid-container {
+  position: fixed;
+  contain: layout;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  display: none;
+  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.5);
+}
+#mermaid-container.active {
+  display: inline-block;
+}
+#mermaid-container > #mermaid-space {
+  border: 1px solid var(--lightgray);
+  background-color: var(--light);
+  border-radius: 5px;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 80vh;
+  width: 80vw;
+  overflow: hidden;
+}
+#mermaid-container > #mermaid-space > .mermaid-content {
+  position: relative;
+  transform-origin: 0 0;
+  transition: transform 0.1s ease;
+  overflow: visible;
+  min-height: 200px;
+  min-width: 200px;
+}
+#mermaid-container > #mermaid-space > .mermaid-content pre {
+  margin: 0;
+  border: none;
+}
+#mermaid-container > #mermaid-space > .mermaid-content svg {
+  max-width: none;
+  height: auto;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 8px;
+  padding: 8px;
+  background: var(--light);
+  border: 1px solid var(--lightgray);
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 2;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--lightgray);
+  background: var(--light);
+  color: var(--dark);
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  font-family: var(--bodyFont);
+  transition: all 0.2s ease;
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:hover {
+  background: var(--lightgray);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:active {
+  transform: translateY(1px);
+}
+#mermaid-container > #mermaid-space > .mermaid-controls .mermaid-control-button:nth-child(2) {
+  width: auto;
+  padding: 0 12px;
+  font-size: 14px;
+}
+/*# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VSb290IjoiL2hvbWUvcnVubmVyL3dvcmsvX3RlbXAvcXVhcnR6L3F1YXJ0ei9jb21wb25lbnRzL3N0eWxlcyIsInNvdXJjZXMiOlsibWVybWFpZC5pbmxpbmUuc2NzcyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTs7QUFHRjtFQUNFO0VBQ0E7O0FBR0Y7RUFDRTs7O0FBS0Y7RUFDRTtFQUNBOzs7QUFJSjtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7O0FBRUE7RUFDRTs7QUFHRjtFQUNFO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTs7QUFHRjtFQUNFO0VBQ0E7O0FBSUo7RUFDRTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBOztBQUVBO0VBQ0U7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTtFQUNBO0VBQ0E7RUFDQTs7QUFFQTtFQUNFOztBQUdGO0VBQ0U7O0FBSUY7RUFDRTtFQUNBO0VBQ0EiLCJzb3VyY2VzQ29udGVudCI6WyIuZXhwYW5kLWJ1dHRvbiB7XG4gIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgZGlzcGxheTogZmxleDtcbiAgZmxvYXQ6IHJpZ2h0O1xuICBwYWRkaW5nOiAwLjRyZW07XG4gIG1hcmdpbjogMC4zcmVtO1xuICByaWdodDogMDsgLy8gTk9URTogcmlnaHQgd2lsbCBiZSBzZXQgaW4gbWVybWFpZC5pbmxpbmUudHNcbiAgY29sb3I6IHZhcigtLWdyYXkpO1xuICBib3JkZXItY29sb3I6IHZhcigtLWRhcmspO1xuICBiYWNrZ3JvdW5kLWNvbG9yOiB2YXIoLS1saWdodCk7XG4gIGJvcmRlcjogMXB4IHNvbGlkO1xuICBib3JkZXItcmFkaXVzOiA1cHg7XG4gIG9wYWNpdHk6IDA7XG4gIHRyYW5zaXRpb246IDAuMnM7XG5cbiAgJiA+IHN2ZyB7XG4gICAgZmlsbDogdmFyKC0tbGlnaHQpO1xuICAgIGZpbHRlcjogY29udHJhc3QoMC4zKTtcbiAgfVxuXG4gICY6aG92ZXIge1xuICAgIGN1cnNvcjogcG9pbnRlcjtcbiAgICBib3JkZXItY29sb3I6IHZhcigtLXNlY29uZGFyeSk7XG4gIH1cblxuICAmOmZvY3VzIHtcbiAgICBvdXRsaW5lOiAwO1xuICB9XG59XG5cbnByZSB7XG4gICY6aG92ZXIgPiAuZXhwYW5kLWJ1dHRvbiB7XG4gICAgb3BhY2l0eTogMTtcbiAgICB0cmFuc2l0aW9uOiAwLjJzO1xuICB9XG59XG5cbiNtZXJtYWlkLWNvbnRhaW5lciB7XG4gIHBvc2l0aW9uOiBmaXhlZDtcbiAgY29udGFpbjogbGF5b3V0O1xuICB6LWluZGV4OiA5OTk7XG4gIGxlZnQ6IDA7XG4gIHRvcDogMDtcbiAgd2lkdGg6IDEwMHZ3O1xuICBoZWlnaHQ6IDEwMHZoO1xuICBvdmVyZmxvdzogaGlkZGVuO1xuICBkaXNwbGF5OiBub25lO1xuICBiYWNrZHJvcC1maWx0ZXI6IGJsdXIoNHB4KTtcbiAgYmFja2dyb3VuZDogcmdiYSgwLCAwLCAwLCAwLjUpO1xuXG4gICYuYWN0aXZlIHtcbiAgICBkaXNwbGF5OiBpbmxpbmUtYmxvY2s7XG4gIH1cblxuICAmID4gI21lcm1haWQtc3BhY2Uge1xuICAgIGJvcmRlcjogMXB4IHNvbGlkIHZhcigtLWxpZ2h0Z3JheSk7XG4gICAgYmFja2dyb3VuZC1jb2xvcjogdmFyKC0tbGlnaHQpO1xuICAgIGJvcmRlci1yYWRpdXM6IDVweDtcbiAgICBwb3NpdGlvbjogZml4ZWQ7XG4gICAgdG9wOiA1MCU7XG4gICAgbGVmdDogNTAlO1xuICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlKC01MCUsIC01MCUpO1xuICAgIGhlaWdodDogODB2aDtcbiAgICB3aWR0aDogODB2dztcbiAgICBvdmVyZmxvdzogaGlkZGVuO1xuXG4gICAgJiA+IC5tZXJtYWlkLWNvbnRlbnQge1xuICAgICAgcG9zaXRpb246IHJlbGF0aXZlO1xuICAgICAgdHJhbnNmb3JtLW9yaWdpbjogMCAwO1xuICAgICAgdHJhbnNpdGlvbjogdHJhbnNmb3JtIDAuMXMgZWFzZTtcbiAgICAgIG92ZXJmbG93OiB2aXNpYmxlO1xuICAgICAgbWluLWhlaWdodDogMjAwcHg7XG4gICAgICBtaW4td2lkdGg6IDIwMHB4O1xuXG4gICAgICBwcmUge1xuICAgICAgICBtYXJnaW46IDA7XG4gICAgICAgIGJvcmRlcjogbm9uZTtcbiAgICAgIH1cblxuICAgICAgc3ZnIHtcbiAgICAgICAgbWF4LXdpZHRoOiBub25lO1xuICAgICAgICBoZWlnaHQ6IGF1dG87XG4gICAgICB9XG4gICAgfVxuXG4gICAgJiA+IC5tZXJtYWlkLWNvbnRyb2xzIHtcbiAgICAgIHBvc2l0aW9uOiBhYnNvbHV0ZTtcbiAgICAgIGJvdHRvbTogMjBweDtcbiAgICAgIHJpZ2h0OiAyMHB4O1xuICAgICAgZGlzcGxheTogZmxleDtcbiAgICAgIGdhcDogOHB4O1xuICAgICAgcGFkZGluZzogOHB4O1xuICAgICAgYmFja2dyb3VuZDogdmFyKC0tbGlnaHQpO1xuICAgICAgYm9yZGVyOiAxcHggc29saWQgdmFyKC0tbGlnaHRncmF5KTtcbiAgICAgIGJvcmRlci1yYWRpdXM6IDZweDtcbiAgICAgIGJveC1zaGFkb3c6IDAgMnB4IDRweCByZ2JhKDAsIDAsIDAsIDAuMSk7XG4gICAgICB6LWluZGV4OiAyO1xuXG4gICAgICAubWVybWFpZC1jb250cm9sLWJ1dHRvbiB7XG4gICAgICAgIGRpc3BsYXk6IGZsZXg7XG4gICAgICAgIGFsaWduLWl0ZW1zOiBjZW50ZXI7XG4gICAgICAgIGp1c3RpZnktY29udGVudDogY2VudGVyO1xuICAgICAgICB3aWR0aDogMzJweDtcbiAgICAgICAgaGVpZ2h0OiAzMnB4O1xuICAgICAgICBwYWRkaW5nOiAwO1xuICAgICAgICBib3JkZXI6IDFweCBzb2xpZCB2YXIoLS1saWdodGdyYXkpO1xuICAgICAgICBiYWNrZ3JvdW5kOiB2YXIoLS1saWdodCk7XG4gICAgICAgIGNvbG9yOiB2YXIoLS1kYXJrKTtcbiAgICAgICAgYm9yZGVyLXJhZGl1czogNHB4O1xuICAgICAgICBjdXJzb3I6IHBvaW50ZXI7XG4gICAgICAgIGZvbnQtc2l6ZTogMTZweDtcbiAgICAgICAgZm9udC1mYW1pbHk6IHZhcigtLWJvZHlGb250KTtcbiAgICAgICAgdHJhbnNpdGlvbjogYWxsIDAuMnMgZWFzZTtcblxuICAgICAgICAmOmhvdmVyIHtcbiAgICAgICAgICBiYWNrZ3JvdW5kOiB2YXIoLS1saWdodGdyYXkpO1xuICAgICAgICB9XG5cbiAgICAgICAgJjphY3RpdmUge1xuICAgICAgICAgIHRyYW5zZm9ybTogdHJhbnNsYXRlWSgxcHgpO1xuICAgICAgICB9XG5cbiAgICAgICAgLy8gU3R5bGUgdGhlIHJlc2V0IGJ1dHRvbiBkaWZmZXJlbnRseVxuICAgICAgICAmOm50aC1jaGlsZCgyKSB7XG4gICAgICAgICAgd2lkdGg6IGF1dG87XG4gICAgICAgICAgcGFkZGluZzogMCAxMnB4O1xuICAgICAgICAgIGZvbnQtc2l6ZTogMTRweDtcbiAgICAgICAgfVxuICAgICAgfVxuICAgIH1cbiAgfVxufVxuIl19 */</style><link href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" rel="stylesheet" type="text/css" data-persist="true"/><script src="../prescript.js" type="application/javascript" data-persist="true"></script><script type="application/javascript" data-persist="true">const fetchData = fetch("../static/contentIndex.json").then(data => data.json())</script><link rel="alternate" type="application/rss+xml" title="RSS Feed" href="https://nikolay-ts.github.io/data-race-notes/index.xml"/><meta property="og:image:width" content="1200"/><meta property="og:image:height" content="630"/><meta property="og:image" content="https://nikolay-ts.github.io/data-race-notes/thoughts/Comparing-Different-Data-Race-Detectors-og-image.webp"/><meta property="og:image:url" content="https://nikolay-ts.github.io/data-race-notes/thoughts/Comparing-Different-Data-Race-Detectors-og-image.webp"/><meta name="twitter:image" content="https://nikolay-ts.github.io/data-race-notes/thoughts/Comparing-Different-Data-Race-Detectors-og-image.webp"/><meta property="og:image:type" content="image/.webp"/></head><body data-slug="thoughts/Comparing-Different-Data-Race-Detectors"><div id="quartz-root" class="page"><div id="quartz-body"><div class="left sidebar"><h2 class="page-title"><a href="..">Data Races Notes</a></h2><div class="spacer mobile-only"></div><div class="flex-component" style="flex-direction: row; flex-wrap: nowrap; gap: 1rem;"><div style="flex-grow: 1; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><div class="search"><button class="search-button"><svg role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 19.9 19.7"><title>Search</title><g class="search-path" fill="none"><path stroke-linecap="square" d="M18.5 18.3l-5.4-5.4"></path><circle cx="8" cy="8" r="7"></circle></g></svg><p>Search</p></button><div class="search-container"><div class="search-space"><input autocomplete="off" class="search-bar" name="search" type="text" aria-label="Search for something" placeholder="Search for something"/><div class="search-layout" data-preview="true"></div></div></div></div></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="darkmode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="dayIcon" x="0px" y="0px" viewBox="0 0 35 35" style="enable-background:new 0 0 35 35" xml:space="preserve" aria-label="Dark mode"><title>Dark mode</title><path d="M6,17.5C6,16.672,5.328,16,4.5,16h-3C0.672,16,0,16.672,0,17.5    S0.672,19,1.5,19h3C5.328,19,6,18.328,6,17.5z M7.5,26c-0.414,0-0.789,0.168-1.061,0.439l-2,2C4.168,28.711,4,29.086,4,29.5    C4,30.328,4.671,31,5.5,31c0.414,0,0.789-0.168,1.06-0.44l2-2C8.832,28.289,9,27.914,9,27.5C9,26.672,8.329,26,7.5,26z M17.5,6    C18.329,6,19,5.328,19,4.5v-3C19,0.672,18.329,0,17.5,0S16,0.672,16,1.5v3C16,5.328,16.671,6,17.5,6z M27.5,9    c0.414,0,0.789-0.168,1.06-0.439l2-2C30.832,6.289,31,5.914,31,5.5C31,4.672,30.329,4,29.5,4c-0.414,0-0.789,0.168-1.061,0.44    l-2,2C26.168,6.711,26,7.086,26,7.5C26,8.328,26.671,9,27.5,9z M6.439,8.561C6.711,8.832,7.086,9,7.5,9C8.328,9,9,8.328,9,7.5    c0-0.414-0.168-0.789-0.439-1.061l-2-2C6.289,4.168,5.914,4,5.5,4C4.672,4,4,4.672,4,5.5c0,0.414,0.168,0.789,0.439,1.06    L6.439,8.561z M33.5,16h-3c-0.828,0-1.5,0.672-1.5,1.5s0.672,1.5,1.5,1.5h3c0.828,0,1.5-0.672,1.5-1.5S34.328,16,33.5,16z     M28.561,26.439C28.289,26.168,27.914,26,27.5,26c-0.828,0-1.5,0.672-1.5,1.5c0,0.414,0.168,0.789,0.439,1.06l2,2    C28.711,30.832,29.086,31,29.5,31c0.828,0,1.5-0.672,1.5-1.5c0-0.414-0.168-0.789-0.439-1.061L28.561,26.439z M17.5,29    c-0.829,0-1.5,0.672-1.5,1.5v3c0,0.828,0.671,1.5,1.5,1.5s1.5-0.672,1.5-1.5v-3C19,29.672,18.329,29,17.5,29z M17.5,7    C11.71,7,7,11.71,7,17.5S11.71,28,17.5,28S28,23.29,28,17.5S23.29,7,17.5,7z M17.5,25c-4.136,0-7.5-3.364-7.5-7.5    c0-4.136,3.364-7.5,7.5-7.5c4.136,0,7.5,3.364,7.5,7.5C25,21.636,21.636,25,17.5,25z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="nightIcon" x="0px" y="0px" viewBox="0 0 100 100" style="enable-background:new 0 0 100 100" xml:space="preserve" aria-label="Light mode"><title>Light mode</title><path d="M96.76,66.458c-0.853-0.852-2.15-1.064-3.23-0.534c-6.063,2.991-12.858,4.571-19.655,4.571  C62.022,70.495,50.88,65.88,42.5,57.5C29.043,44.043,25.658,23.536,34.076,6.47c0.532-1.08,0.318-2.379-0.534-3.23  c-0.851-0.852-2.15-1.064-3.23-0.534c-4.918,2.427-9.375,5.619-13.246,9.491c-9.447,9.447-14.65,22.008-14.65,35.369  c0,13.36,5.203,25.921,14.65,35.368s22.008,14.65,35.368,14.65c13.361,0,25.921-5.203,35.369-14.65  c3.872-3.871,7.064-8.328,9.491-13.246C97.826,68.608,97.611,67.309,96.76,66.458z"></path></svg></button></div><div style="flex-grow: 0; flex-shrink: 1; flex-basis: auto; order: 0; align-self: center; justify-self: center;"><button class="readermode"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="readerIcon" fill="currentColor" stroke="currentColor" stroke-width="0.2" stroke-linecap="round" stroke-linejoin="round" width="64px" height="64px" viewBox="0 0 24 24" aria-label="Reader mode"><title>Reader mode</title><g transform="translate(-1.8, -1.8) scale(1.15, 1.2)"><path d="M8.9891247,2.5 C10.1384702,2.5 11.2209868,2.96705384 12.0049645,3.76669482 C12.7883914,2.96705384 13.8709081,2.5 15.0202536,2.5 L18.7549359,2.5 C19.1691495,2.5 19.5049359,2.83578644 19.5049359,3.25 L19.5046891,4.004 L21.2546891,4.00457396 C21.6343849,4.00457396 21.9481801,4.28672784 21.9978425,4.6528034 L22.0046891,4.75457396 L22.0046891,20.25 C22.0046891,20.6296958 21.7225353,20.943491 21.3564597,20.9931534 L21.2546891,21 L2.75468914,21 C2.37499337,21 2.06119817,20.7178461 2.01153575,20.3517706 L2.00468914,20.25 L2.00468914,4.75457396 C2.00468914,4.37487819 2.28684302,4.061083 2.65291858,4.01142057 L2.75468914,4.00457396 L4.50368914,4.004 L4.50444233,3.25 C4.50444233,2.87030423 4.78659621,2.55650904 5.15267177,2.50684662 L5.25444233,2.5 L8.9891247,2.5 Z M4.50368914,5.504 L3.50468914,5.504 L3.50468914,19.5 L10.9478955,19.4998273 C10.4513189,18.9207296 9.73864328,18.5588115 8.96709342,18.5065584 L8.77307039,18.5 L5.25444233,18.5 C4.87474657,18.5 4.56095137,18.2178461 4.51128895,17.8517706 L4.50444233,17.75 L4.50368914,5.504 Z M19.5049359,17.75 C19.5049359,18.1642136 19.1691495,18.5 18.7549359,18.5 L15.2363079,18.5 C14.3910149,18.5 13.5994408,18.8724714 13.0614828,19.4998273 L20.5046891,19.5 L20.5046891,5.504 L19.5046891,5.504 L19.5049359,17.75 Z M18.0059359,3.999 L15.0202536,4 L14.8259077,4.00692283 C13.9889509,4.06666544 13.2254227,4.50975805 12.7549359,5.212 L12.7549359,17.777 L12.7782651,17.7601316 C13.4923805,17.2719483 14.3447024,17 15.2363079,17 L18.0059359,16.999 L18.0056891,4.798 L18.0033792,4.75457396 L18.0056891,4.71 L18.0059359,3.999 Z M8.9891247,4 L6.00368914,3.999 L6.00599909,4.75457396 L6.00599909,4.75457396 L6.00368914,4.783 L6.00368914,16.999 L8.77307039,17 C9.57551536,17 10.3461406,17.2202781 11.0128313,17.6202194 L11.2536891,17.776 L11.2536891,5.211 C10.8200889,4.56369974 10.1361548,4.13636104 9.37521067,4.02745763 L9.18347055,4.00692283 L8.9891247,4 Z"></path></g></svg></button></div></div><div class="explorer" data-behavior="link" data-collapsed="collapsed" data-savestate="true" data-data-fns="{&quot;order&quot;:[&quot;filter&quot;,&quot;map&quot;,&quot;sort&quot;],&quot;sortFn&quot;:&quot;(a,b)=>!a.isFolder&amp;&amp;!b.isFolder||a.isFolder&amp;&amp;b.isFolder?a.displayName.localeCompare(b.displayName,void 0,{numeric:!0,sensitivity:\&quot;base\&quot;}):!a.isFolder&amp;&amp;b.isFolder?1:-1&quot;,&quot;filterFn&quot;:&quot;node=>node.slugSegment!==\&quot;tags\&quot;&quot;,&quot;mapFn&quot;:&quot;node=>node&quot;}"><button type="button" class="explorer-toggle mobile-explorer hide-until-loaded" data-mobile="true" aria-controls="explorer-77"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide-menu"><line x1="4" x2="20" y1="12" y2="12"></line><line x1="4" x2="20" y1="6" y2="6"></line><line x1="4" x2="20" y1="18" y2="18"></line></svg></button><button type="button" class="title-button explorer-toggle desktop-explorer" data-mobile="false" aria-expanded="true"><h2>Explorer</h2><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><div id="explorer-77" class="explorer-content" aria-expanded="false" role="group"><ul class="explorer-ul overflow" id="list-0"><li class="overflow-end"></li></ul></div><template id="template-file"><li><a href="#"></a></li></template><template id="template-folder"><li><div class="folder-container"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="5 8 14 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="folder-icon"><polyline points="6 9 12 15 18 9"></polyline></svg><div><button class="folder-button"><span class="folder-title"></span></button></div></div><div class="folder-outer"><ul class="content"></ul></div></li></template></div></div><div class="center"><div class="page-header"><div class="popover-hint"><nav class="breadcrumb-container" aria-label="breadcrumbs"><div class="breadcrumb-element"><a href="../">Home</a><p> ❯ </p></div><div class="breadcrumb-element"><a href="../thoughts/">thoughts</a><p> ❯ </p></div><div class="breadcrumb-element"><a href>Comparing Different Data Race Detectors</a></div></nav><h1 class="article-title">Comparing Different Data-Race Detectors</h1><p show-comma="true" class="content-meta"><time datetime="2026-10-29T19:52:10.000Z">Oct 29, 2026</time><span>10 min read</span></p><ul class="tags"><li><a href="../tags/thoughts" class="internal tag-link">thoughts</a></li><li><a href="../tags/data-race" class="internal tag-link">data-race</a></li></ul></div></div><article class="popover-hint"><p><a href=".././tags/thoughts" class="tag-link internal alias" data-slug="tags/thoughts">thoughts</a> <a href=".././tags/data-race" class="tag-link internal alias" data-slug="tags/data-race">data-race</a></p>
+<h2 id="recap">Recap<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#recap" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Eraser is the founder of them all and was the first to use the <a href="../lit-notes/races/Happens-Before-Relation" class="internal alias" data-slug="lit-notes/races/Happens-Before-Relation">Happens-Before Relation</a>. It used the set of all locks and all locks held and with enough runs it will know if a shared variable is exposed if the set <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span></span></span></span> for some shared variable <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span></span></span></span> was empty (<a href="../lit-notes/races/Eraser" class="internal" data-slug="lit-notes/races/Eraser">Eraser</a>, <a href="../sources/md/eraser" class="internal" data-slug="sources/md/eraser">eraser</a>). However it is only on the CPU, it uses vector clocks so it is also very expensive.</p>
+<p>FastTrack builds on happens-before but notices that most memory accesses are writes that are totally ordered in practice. So instead of maintaining a heavy vector clock for everything, it uses an <code>epoch</code> (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span> clock + thread ID) for writes and single-reader reads, only falling back to full vector clocks when there are concurrent reads (<a href="../lit-notes/races/FastTrack" class="internal" data-slug="lit-notes/races/FastTrack">FastTrack</a>, <a href="../sources/md/fast-track" class="internal" data-slug="sources/md/fast-track">fast-track</a>). It gives constant-time fast paths on the CPU, but it is still CPU-focused and vector clocks do not scale to <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">5</span></span></span></span></span></span></span></span></span></span></span> GPU threads.</p>
+<p>ScoRD is an efficient hardware-based scoped race detector for GPUs (<a href="../lit-notes/races/ScoRD" class="internal" data-slug="lit-notes/races/ScoRD">ScoRD</a>, <a href="../sources/md/isca20_ScoRD" class="internal" data-slug="sources/md/isca20_ScoRD">isca20_ScoRD</a>). It extends each SM with a small hardware state (~3 KB) and combines happens-before with lockset analysis (inferring locks from atomic instructions &amp; fences). The cool thing about ScoRD is that it uses a software cache in global mem to track recently accessed metadata, cutting the metadata footprint down by 16x (to ~12.5%) with only ~35% runtime overhead. The main drawback is that it requires custom hardware modifications, so we cannot run it on existing silicon.</p>
+<p>PreDataR brings predictive race detection to GPUs using vector clocks (<a href="../lit-notes/races/PreDataR" class="internal" data-slug="lit-notes/races/PreDataR">PreDataR</a>, <a href="../sources/md/asplos21_predatar" class="internal" data-slug="sources/md/asplos21_predatar">asplos21_predatar</a>). Unlike pure happens-before which only catches races if they physically collide during that exact run, PreDataR uses a partial-order relation called GWCP (GPU Weakest Causality Partial order) to predict races that <em>could</em> happen under alternative valid thread schedules. It is sound (no false positives), but tracking full vector clocks across thousands of GPU threads causes prohibitive memory and runtime overheads.</p>
+<p>SuperCollider is a very interesting tool as it is both a compiler tool-chain and a run-time. The good thing is that it is easy to understand and uses a simple technique of sleep for random times and then checking again if the value is valid. It is also fully on-device which is very good for memory performance and is also stateless, (meaning low metadata overhead). It can also work with async data copying and tensor memory acceleration. The main drawback is that existing binaries would need to recompile with the sanitizer flag of NVCC (<a href="../lit-notes/races/Super-Collider" class="internal alias" data-slug="lit-notes/races/Super-Collider">Super Collider</a>, <a href="../sources/md/super-collider" class="internal" data-slug="sources/md/super-collider">super-collider</a>).</p>
+<p>iGUARD is the main paper that this research is based on since the main goal is to have a inter-process data-race detector that does not require any recompilation. The main tool iGUARD uses is <a href="../lit-notes/patching/NVBit" class="internal" data-slug="lit-notes/patching/NVBit">NVBit</a> (<a href="../sources/md/MICRO_2019_NVBit" class="internal" data-slug="sources/md/MICRO_2019_NVBit">MICRO_2019_NVBit</a>), which is a dynamic instrumentation tool which allows for the injection of arbitrary code after a given <a href="../lit-notes/general/Cuda-Events" class="internal alias" data-slug="lit-notes/general/Cuda-Events">Cuda Events</a>. It tackles race conditions also induced due to a different scope or due to ITS and tries to use memory primitives such as <a href="../lit-notes/memory/Relaxed-Memory-Consistency" class="internal alias" data-slug="lit-notes/memory/Relaxed-Memory-Consistency">fences</a> to infer locking and unlock.</p>
+<p>The way it works is that you have MD for each memory location (4 bytes of MD per byte of shared mem), which has the sync operations &amp; tracks which threads use them and with what scope. All the stores, loads and atomics are accounted for in the MD. It uses a similar technique to <a href="../lit-notes/races/ScoRD" class="internal" data-slug="lit-notes/races/ScoRD">ScoRD</a> to detect data races.</p>
+<p>The main novelty is how it infers the locking protocols and ITS detection. For ITS it assumes that the locking is per-warp until two or more same-warp threads try to lock/unlock to which after it becomes sub-warp locking. Because of the unified virtual mem and some optimization, the transfer of the MD is not that bad but still has around 17x mem overhead (<a href="../lit-notes/races/iGuard" class="internal" data-slug="lit-notes/races/iGuard">iGuard</a>, <a href="../sources/md/SOSP21_iGUARD" class="internal" data-slug="sources/md/SOSP21_iGUARD">SOSP21_iGUARD</a>).</p>
+<p>HiRace was created because of data-races due to the scope/hierarchy (<a href="../HiRace" class="internal" data-slug="HiRace">HiRace</a>, <a href="../sources/md/sc24_hirace" class="internal" data-slug="sources/md/sc24_hirace">sc24_hirace</a>). The main novelties it brought is that it showed that with a flag set for (multiple access), you only need to record the last accessor of a mem location. It also brought a 25-state finite state machine which can be proven using Murphi. The drawback is that it relies on Clang source rewriting, requiring source access and recompilation.</p>
+<p>Compute Sanitizer (<a href="../lit-notes/races/Compute-Sanitizer" class="internal alias" data-slug="lit-notes/races/Compute-Sanitizer">Compute Sanitizer</a>, <a href="../sources/md/Computer-Sanitizer" class="internal alias" data-slug="sources/md/Computer-Sanitizer">Computer Sanitizer</a>) is the official NVIDIA tool suite. Its <code>racecheck</code> tool (<a href="../lit-notes/races/RaceCheck" class="internal" data-slug="lit-notes/races/RaceCheck">RaceCheck</a>) dynamically catches hazards (RAW, WAR, WAW) without recompilation, while <code>synccheck</code> (<a href="../lit-notes/races/Synccheck" class="internal" data-slug="lit-notes/races/Synccheck">Synccheck</a>) checks barrier usage. The main limitation is that RaceCheck only checks shared memory (scratchpad), missing global memory races, has very high runtime overhead (often 20x-50x+), and only runs within a single process context.</p>
+<hr/>
+<h2 id="how-to-categorize-data-race-detectors">How to Categorize Data-Race Detectors<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#how-to-categorize-data-race-detectors" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>Looking at all the literature, we can categorize race detectors across 4 main dimensions:</p>
+<h3 id="1-instrumentation-level-where-is-the-code-patched">1. Instrumentation Level (Where is the code patched?)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-instrumentation-level-where-is-the-code-patched" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Dynamic Binary Instrumentation (DBI):</strong> Instruments machine instructions (SASS / binary) at load-time or runtime without source code. Examples: <a href="../lit-notes/races/iGuard" class="internal" data-slug="lit-notes/races/iGuard">iGuard</a> (via <a href="../lit-notes/patching/NVBit" class="internal" data-slug="lit-notes/patching/NVBit">NVBit</a>), <a href="../lit-notes/races/Compute-Sanitizer" class="internal alias" data-slug="lit-notes/races/Compute-Sanitizer">Compute Sanitizer</a>, <a href="../lit-notes/races/Eraser" class="internal" data-slug="lit-notes/races/Eraser">Eraser</a> (via ATOM).
+<ul>
+<li><em>Pros:</em> No recompilation required; works on existing commercial / closed-source binaries.</li>
+<li><em>Cons:</em> Architecture-specific, higher runtime overhead, harder to map back to high-level source lines.</li>
+</ul>
+</li>
+<li><strong>Compiler IR Pass:</strong> Instruments intermediate representation (LLVM IR / PTX) during compilation. Examples: <a href="../lit-notes/races/Super-Collider" class="internal alias" data-slug="lit-notes/races/Super-Collider">Super Collider</a> (via NVCC/LLVM pass).
+<ul>
+<li><em>Pros:</em> Deep compiler optimizations, access to register allocation and new PTX instructions (like <code>cp.async</code>).</li>
+<li><em>Cons:</em> Requires recompiling all kernels with custom flags (<code>--sanitize=supercollider</code>).</li>
+</ul>
+</li>
+<li><strong>Source-Level Rewriting:</strong> Rewrites source AST before compilation. Examples: <a href="../HiRace" class="internal" data-slug="HiRace">HiRace</a> (via Clang LibTooling).
+<ul>
+<li><em>Pros:</em> Vendor-agnostic (can target NVIDIA, AMD, Intel); preserves full source abstractions.</li>
+<li><em>Cons:</em> Breaks if code uses non-standard extensions; requires full source access and recompilation.</li>
+</ul>
+</li>
+<li><strong>Hardware-Assisted:</strong> Modifies processor architecture / SM pipeline. Examples: <a href="../lit-notes/races/ScoRD" class="internal" data-slug="lit-notes/races/ScoRD">ScoRD</a>.
+<ul>
+<li><em>Pros:</em> Near-zero overhead (~35%); transparent to software.</li>
+<li><em>Cons:</em> Requires new silicon; impossible to deploy on existing GPUs.</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-core-detection-logic-how-are-races-identified">2. Core Detection Logic (How are races identified?)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-core-detection-logic-how-are-races-identified" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Lockset Analysis:</strong> Enforces a consistent locking discipline (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∩</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span>). Catches latent races even if thread interleavings do not directly collide at runtime. Examples: <a href="../lit-notes/races/Eraser" class="internal" data-slug="lit-notes/races/Eraser">Eraser</a>, locking subsystem of <a href="../lit-notes/races/iGuard" class="internal" data-slug="lit-notes/races/iGuard">iGuard</a> and <a href="../lit-notes/races/ScoRD" class="internal" data-slug="lit-notes/races/ScoRD">ScoRD</a>.</li>
+<li><strong>Happens-Before (HB) / Vector Clocks:</strong> Tracks Lamport causal ordering between memory accesses and sync operations. Precise with zero false positives on observed executions. Examples: <a href="../lit-notes/races/FastTrack" class="internal" data-slug="lit-notes/races/FastTrack">FastTrack</a>, <a href="../lit-notes/races/ScoRD" class="internal" data-slug="lit-notes/races/ScoRD">ScoRD</a>, <a href="../lit-notes/races/iGuard" class="internal" data-slug="lit-notes/races/iGuard">iGuard</a>.</li>
+<li><strong>Finite State Machine (FSM):</strong> Encodes the state of each memory location into an explicit transition diagram based on access types and barriers. Formally verifiable. Examples: <a href="../HiRace" class="internal" data-slug="HiRace">HiRace</a> (25 states).</li>
+<li><strong>Stateless Value-Sampling &amp; Delays:</strong> Injects random delays (<code>nanosleep</code>) between weak accesses and redundant strong reads. Sync-agnostic; detects races if values change unexpectedly. Examples: <a href="../lit-notes/races/Super-Collider" class="internal alias" data-slug="lit-notes/races/Super-Collider">Super Collider</a> (and <a href="../sources/md/DataCollider" class="internal" data-slug="sources/md/DataCollider">DataCollider</a> on CPU).</li>
+<li><strong>Predictive Partial Orders:</strong> Formulates alternative valid executions from a single execution trace (e.g. GWCP). Examples: <a href="../lit-notes/races/PreDataR" class="internal" data-slug="lit-notes/races/PreDataR">PreDataR</a>.</li>
+</ul>
+<h3 id="3-metadata-md-footprint--management-how-heavy-is-the-state">3. Metadata (MD) Footprint &amp; Management (How heavy is the state?)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-metadata-md-footprint--management-how-heavy-is-the-state" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Heavyweight Shadow Memory:</strong> Dedicated shadow memory per word or byte (e.g. iGUARD allocates 16B MD per 4B mem <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">→</span></span></span></span> up to 17x overhead), managed via <a href="../lit-notes/general/Unified-Memory-Programming" class="internal alias" data-slug="lit-notes/general/Unified-Memory-Programming">UVM</a> page migration.</li>
+<li><strong>Single Access Record:</strong> Only stores the last accessor ID + multiple-access flags (HiRace), maintaining constant-size shadow memory per location.</li>
+<li><strong>Cache-Filtered Shadow Memory:</strong> Keeps MD only for recently accessed addresses in a direct-mapped software cache (ScoRD), cutting overhead to ~12.5%.</li>
+<li><strong>Fully Stateless (Zero MD):</strong> No persistent shadow memory tables at all (SuperCollider). Uses only short-lived registers.</li>
+</ul>
+<h3 id="4-gpu-architecture--concurrency-support">4. GPU Architecture &amp; Concurrency Support<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#4-gpu-architecture--concurrency-support" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><strong>Memory Scopes:</strong> Can the tool differentiate between <code>block</code>, <code>device</code>, and <code>system</code> memory scopes for atomics and fences?</li>
+<li><strong><a href="../lit-notes/general/Independent-Thread-Scheduling" class="internal alias" data-slug="lit-notes/general/Independent-Thread-Scheduling">Independent Thread Scheduling (ITS)</a>:</strong> Does the detector handle sub-warp divergence and warp-yield correctly, or does it assume lockstep warps?</li>
+<li><strong>Modern Hardware Features:</strong> Support for Cooperative Groups, Tensor Memory Accelerator (TMA), and asynchronous bulk copies (<code>cp.async</code>).</li>
+<li><strong>Inter-Process Communication (IPC):</strong> Can the tool track races across independent processes sharing GPU memory?</li>
+</ul>
+<hr/>
+<h2 id="comparison-table">Comparison Table<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#comparison-table" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">Tool</th><th style="text-align:left;">Target Arch</th><th style="text-align:left;">Instrumentation Level</th><th style="text-align:left;">Recompile?</th><th style="text-align:left;">Detection Paradigm</th><th style="text-align:left;">Metadata Overhead</th><th style="text-align:left;">Runtime Overhead</th><th style="text-align:left;">Memory Checked</th><th style="text-align:left;">Scope &amp; ITS Support</th><th style="text-align:left;">Predictive?</th><th style="text-align:left;">False Positives?</th><th style="text-align:left;">Source Link</th></tr></thead><tbody><tr><td style="text-align:left;"><strong><a href="../lit-notes/races/Eraser" class="internal" data-slug="lit-notes/races/Eraser">Eraser</a></strong></td><td style="text-align:left;">CPU</td><td style="text-align:left;">Dynamic Binary (ATOM)</td><td style="text-align:left;"><strong>No</strong></td><td style="text-align:left;">Lockset (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∩</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span>)</td><td style="text-align:left;">Shadow Mem (locks)</td><td style="text-align:left;">~10x-30x</td><td style="text-align:left;">CPU Shared</td><td style="text-align:left;">N/A (CPU locks)</td><td style="text-align:left;"><strong>Yes</strong> (for locks)</td><td style="text-align:left;"><strong>Yes</strong> (imprecise)</td><td style="text-align:left;"><a href="../sources/md/eraser" class="internal" data-slug="sources/md/eraser">eraser</a></td></tr><tr><td style="text-align:left;"><strong><a href="../lit-notes/races/FastTrack" class="internal" data-slug="lit-notes/races/FastTrack">FastTrack</a></strong></td><td style="text-align:left;">CPU</td><td style="text-align:left;">Bytecode / VM (RoadRunner)</td><td style="text-align:left;"><strong>Yes</strong> (Bytecode)</td><td style="text-align:left;">Epoch-based Happens-Before</td><td style="text-align:left;">Epochs (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord">1</span><span class="mclose">)</span></span></span></span>) + VC fallback</td><td style="text-align:left;">~2x-8x</td><td style="text-align:left;">CPU Heap / Shared</td><td style="text-align:left;">N/A (CPU threads)</td><td style="text-align:left;"><strong>No</strong> (manifest only)</td><td style="text-align:left;"><strong>No</strong> (sound)</td><td style="text-align:left;"><a href="../sources/md/fast-track" class="internal" data-slug="sources/md/fast-track">fast-track</a></td></tr><tr><td style="text-align:left;"><strong><a href="../lit-notes/races/ScoRD" class="internal" data-slug="lit-notes/races/ScoRD">ScoRD</a></strong></td><td style="text-align:left;">GPU</td><td style="text-align:left;">Hardware Extension (SM)</td><td style="text-align:left;"><strong>No</strong></td><td style="text-align:left;">Hybrid HB + Lockset</td><td style="text-align:left;">Cache-Filtered (12.5%)</td><td style="text-align:left;">~35% (very low)</td><td style="text-align:left;">Global &amp; Shared</td><td style="text-align:left;">Scopes: Block, Dev, Sys; No ITS</td><td style="text-align:left;"><strong>Partial</strong> (Lockset part)</td><td style="text-align:left;"><strong>No</strong></td><td style="text-align:left;"><a href="../sources/md/isca20_ScoRD" class="internal" data-slug="sources/md/isca20_ScoRD">isca20_ScoRD</a></td></tr><tr><td style="text-align:left;"><strong><a href="../lit-notes/races/PreDataR" class="internal" data-slug="lit-notes/races/PreDataR">PreDataR</a></strong></td><td style="text-align:left;">GPU</td><td style="text-align:left;">Dynamic Trace Analysis</td><td style="text-align:left;"><strong>No</strong></td><td style="text-align:left;">Predictive Partial Order (GWCP)</td><td style="text-align:left;">Heavy (full Vector Clocks)</td><td style="text-align:left;">>10x-50x</td><td style="text-align:left;">Global &amp; Shared</td><td style="text-align:left;">Scopes &amp; atomics; No ITS</td><td style="text-align:left;"><strong>Yes</strong> (GWCP predictions)</td><td style="text-align:left;"><strong>No</strong> (sound)</td><td style="text-align:left;"><a href="../sources/md/asplos21_predatar" class="internal" data-slug="sources/md/asplos21_predatar">asplos21_predatar</a></td></tr><tr><td style="text-align:left;"><strong><a href="../lit-notes/races/iGuard" class="internal" data-slug="lit-notes/races/iGuard">iGuard</a></strong></td><td style="text-align:left;">GPU (NVIDIA)</td><td style="text-align:left;">Dynamic Binary (<a href="../lit-notes/patching/NVBit" class="internal" data-slug="lit-notes/patching/NVBit">NVBit</a>)</td><td style="text-align:left;"><strong>No</strong></td><td style="text-align:left;">Hybrid HB + Lockset (infer locks)</td><td style="text-align:left;">Heavy UVM Shadow (4x-17x)</td><td style="text-align:left;">~1.5x-3x</td><td style="text-align:left;">Global &amp; Shared</td><td style="text-align:left;">Scopes: Block &amp; Dev; Full ITS</td><td style="text-align:left;"><strong>Partial</strong> (inferred lockset)</td><td style="text-align:left;"><strong>No</strong></td><td style="text-align:left;"><a href="../sources/md/SOSP21_iGUARD" class="internal" data-slug="sources/md/SOSP21_iGUARD">SOSP21_iGUARD</a></td></tr><tr><td style="text-align:left;"><strong><a href="../lit-notes/races/Compute-Sanitizer" class="internal alias" data-slug="lit-notes/races/Compute-Sanitizer">Compute Sanitizer</a></strong></td><td style="text-align:left;">GPU (NVIDIA)</td><td style="text-align:left;">Dynamic Binary (Sanitizer API)</td><td style="text-align:left;"><strong>No</strong></td><td style="text-align:left;">Hazard tracking (RAW, WAR, WAW)</td><td style="text-align:left;">Internal driver state</td><td style="text-align:left;">>10x-50x</td><td style="text-align:left;"><strong>Shared only</strong> (scratchpad)</td><td style="text-align:left;">Warp &amp; Block barriers (<code>synccheck</code>)</td><td style="text-align:left;"><strong>No</strong> (manifest only)</td><td style="text-align:left;"><strong>No</strong></td><td style="text-align:left;"><a href="../sources/md/Computer-Sanitizer" class="internal alias" data-slug="sources/md/Computer-Sanitizer">Computer Sanitizer</a></td></tr><tr><td style="text-align:left;"><strong><a href="../HiRace" class="internal" data-slug="HiRace">HiRace</a></strong></td><td style="text-align:left;">GPU (Vendor Agnostic)</td><td style="text-align:left;">Source AST (Clang LibTooling)</td><td style="text-align:left;"><strong>Yes</strong></td><td style="text-align:left;">25-State FSM (Murphi-verified)</td><td style="text-align:left;">Single Access Record (constant)</td><td style="text-align:left;">~1.3x-2x</td><td style="text-align:left;">Global &amp; Shared</td><td style="text-align:left;">Hierarchical scopes; barriers</td><td style="text-align:left;"><strong>No</strong> (manifest only)</td><td style="text-align:left;"><strong>No</strong></td><td style="text-align:left;"><a href="../sources/md/sc24_hirace" class="internal" data-slug="sources/md/sc24_hirace">sc24_hirace</a></td></tr><tr><td style="text-align:left;"><strong><a href="../lit-notes/races/Super-Collider" class="internal alias" data-slug="lit-notes/races/Super-Collider">Super Collider</a></strong></td><td style="text-align:left;">GPU (NVIDIA)</td><td style="text-align:left;">Compiler Pass (NVCC/LLVM) + Runtime</td><td style="text-align:left;"><strong>Yes</strong></td><td style="text-align:left;">Stateless Redundant Reads &amp; Delays</td><td style="text-align:left;"><strong>0% (Stateless)</strong></td><td style="text-align:left;">~2x-5x</td><td style="text-align:left;">Global, Shared, Generic</td><td style="text-align:left;">Warp/block shuffling; TMA/async</td><td style="text-align:left;"><strong>Probabilistic</strong> (via delays)</td><td style="text-align:left;"><strong>No</strong> (probabilistic sound)</td><td style="text-align:left;"><a href="../sources/md/super-collider" class="internal" data-slug="sources/md/super-collider">super-collider</a></td></tr></tbody></table></div>
+<hr/>
+<h2 id="gpu-concurrency--feature-matrix">GPU Concurrency &amp; Feature Matrix<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#gpu-concurrency--feature-matrix" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>To clearly see how modern GPU mechanisms are supported across the GPU tools:</p>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="table-container"><table><thead><tr><th style="text-align:left;">Feature</th><th style="text-align:left;"><a href="../lit-notes/races/ScoRD" class="internal" data-slug="lit-notes/races/ScoRD">ScoRD</a></th><th style="text-align:left;"><a href="../lit-notes/races/PreDataR" class="internal" data-slug="lit-notes/races/PreDataR">PreDataR</a></th><th style="text-align:left;"><a href="../lit-notes/races/iGuard" class="internal" data-slug="lit-notes/races/iGuard">iGuard</a></th><th style="text-align:left;"><a href="../lit-notes/races/Compute-Sanitizer" class="internal alias" data-slug="lit-notes/races/Compute-Sanitizer">Compute Sanitizer</a></th><th style="text-align:left;"><a href="../HiRace" class="internal" data-slug="HiRace">HiRace</a></th><th style="text-align:left;"><a href="../lit-notes/races/Super-Collider" class="internal alias" data-slug="lit-notes/races/Super-Collider">Super Collider</a></th><th></th></tr></thead><tbody><tr><td style="text-align:left;"><strong>Shared Memory (<code>__shared__</code>)</strong></td><td style="text-align:left;">✅ Yes</td><td style="text-align:left;">✅ Yes</td><td style="text-align:left;">✅ Yes</td><td style="text-align:left;">✅ Yes (primary)</td><td style="text-align:left;">✅ Yes</td><td style="text-align:left;">✅ Yes</td><td></td></tr><tr><td style="text-align:left;"><strong>Global Memory (<code>__global__</code>)</strong></td><td style="text-align:left;">✅ Yes</td><td style="text-align:left;">✅ Yes</td><td style="text-align:left;">✅ Yes</td><td style="text-align:left;">❌ No</td><td style="text-align:left;">✅ Yes</td><td style="text-align:left;">✅ Yes</td><td></td></tr><tr><td style="text-align:left;"><strong>Scoped Atomics &amp; Fences</strong></td><td style="text-align:left;">✅ Block, Dev, Sys</td><td style="text-align:left;">✅ Scoped atomics</td><td style="text-align:left;">✅ Block &amp; Dev</td><td style="text-align:left;">❌ No</td><td style="text-align:left;">✅ Scope hierarchy</td><td style="text-align:left;">❌ Sync-agnostic</td><td></td></tr><tr><td style="text-align:left;"><a href="../lit-notes/general/Independent-Thread-Scheduling" class="internal alias" data-slug="lit-notes/general/Independent-Thread-Scheduling">Independent Thread Scheduling</a></td><td style="text-align:left;">ITS]] (Sub-warp Divergence)**</td><td style="text-align:left;">❌ No</td><td style="text-align:left;">❌ No</td><td style="text-align:left;">✅ Yes (warp vs thread lock)</td><td style="text-align:left;">⚠️ Partial (<code>synccheck</code>)</td><td style="text-align:left;">❌ Warp-scalar only</td><td>✅ Yes (<code>nanosleep</code> yield)</td></tr><tr><td style="text-align:left;"><strong>Cooperative Groups</strong></td><td style="text-align:left;">❌ No</td><td style="text-align:left;">❌ No</td><td style="text-align:left;">✅ Yes</td><td style="text-align:left;">⚠️ Basic barrier checks</td><td style="text-align:left;">❌ No</td><td style="text-align:left;">✅ Yes</td><td></td></tr><tr><td style="text-align:left;"><strong>Async Bulk Copy / TMA</strong></td><td style="text-align:left;">❌ No</td><td style="text-align:left;">❌ No</td><td style="text-align:left;">❌ No</td><td style="text-align:left;">❌ No</td><td style="text-align:left;">❌ No</td><td style="text-align:left;">✅ Yes (<code>cp.async</code> checking)</td><td></td></tr><tr><td style="text-align:left;"><strong>No Source Recompile Required</strong></td><td style="text-align:left;">✅ Yes (Hardware)</td><td style="text-align:left;">✅ Yes (Binary trace)</td><td style="text-align:left;">✅ <strong>Yes (NVBit)</strong></td><td style="text-align:left;">✅ <strong>Yes (Sanitizer)</strong></td><td style="text-align:left;">❌ No (Clang rewrite)</td><td style="text-align:left;">❌ No (NVCC flag)</td><td></td></tr><tr><td style="text-align:left;"><strong>Inter-Process (IPC) Ready</strong></td><td style="text-align:left;">❌ Hardware only</td><td style="text-align:left;">❌ Trace per proc</td><td style="text-align:left;">⚠️ Single-process MD</td><td style="text-align:left;">❌ Single context</td><td style="text-align:left;">❌ Single-process AST</td><td style="text-align:left;">⚠️ Logic ready, needs recompile</td><td></td></tr></tbody></table></div>
+<hr/>
+<h2 id="key-insights-for-inter-process-race-detection-my-research">Key Insights for Inter-Process Race Detection (My Research)<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#key-insights-for-inter-process-race-detection-my-research" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h2>
+<p>My research project focus is building an <strong>inter-process GPU data-race detector that does not require recompilation</strong> (see <a href="../sources/md/inter-process_communication_in_linux" class="internal" data-slug="sources/md/inter-process_communication_in_linux">inter-process_communication_in_linux</a>, <a href="../Meeting-notes/26.10.14" class="internal" data-slug="Meeting-notes/26.10.14">26.10.14</a>, and <a href="../Documentation" class="internal" data-slug="Documentation">Documentation.md</a>).</p>
+<p>Looking at the table above, here is how the existing categories impact our design:</p>
+<h3 id="1-the-recompilation-bottleneck">1. The Recompilation Bottleneck<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#1-the-recompilation-bottleneck" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li>Tools like <a href="../lit-notes/races/Super-Collider" class="internal alias" data-slug="lit-notes/races/Super-Collider">Super Collider</a> and <a href="../HiRace" class="internal" data-slug="HiRace">HiRace</a> have huge advantages in memory footprint (0% for SuperCollider, compact FSM for HiRace).</li>
+<li>However, both require recompiling the application from source. If our requirement is to inspect arbitrary pre-compiled binaries or vendor libraries sharing GPU memory, <strong>Dynamic Binary Instrumentation (DBI)</strong> via <a href="../lit-notes/patching/NVBit" class="internal" data-slug="lit-notes/patching/NVBit">NVBit</a> (<a href="../sources/md/MICRO_2019_NVBit" class="internal" data-slug="sources/md/MICRO_2019_NVBit">MICRO_2019_NVBit</a>) or the NVIDIA Sanitizer API is the only viable path.</li>
+</ul>
+<h3 id="2-the-metadata-problem-across-process-boundaries">2. The Metadata Problem Across Process Boundaries<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#2-the-metadata-problem-across-process-boundaries" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><a href="../lit-notes/races/iGuard" class="internal" data-slug="lit-notes/races/iGuard">iGuard</a> is our closest baseline because it runs dynamically on SASS via NVBit and understands scopes and ITS.</li>
+<li>However, iGUARD allocates its shadow metadata in device memory using <code>cudaMallocManaged()</code> within the address space of a <strong>single process</strong>.</li>
+<li>In an inter-process setting (where Process A and Process B share memory via <code>cudaIpcGetMemHandle()</code> or POSIX shared memory mapped to CUDA virtual memory):
+<ol>
+<li>Process A and Process B have separate CPU and GPU virtual address spaces.</li>
+<li>If Process A writes to shared memory, Process B’s iGUARD instrumentation cannot see Process A’s metadata unless the metadata itself is located in an IPC-shared memory pool.</li>
+<li>Therefore, to adapt iGUARD for IPC, we must allocate the shadow metadata in an IPC-shared region (<code>cudaIpcMemHandle</code> or POSIX shm) so both processes can read and update the same lock/accessor records.</li>
+</ol>
+</li>
+</ul>
+<h3 id="3-can-we-borrow-stateless-value-sampling-dynamically">3. Can We Borrow Stateless Value-Sampling Dynamically?<a role="anchor" aria-hidden="true" tabindex="-1" data-no-popover="true" href="#3-can-we-borrow-stateless-value-sampling-dynamically" class="internal"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg></a></h3>
+<ul>
+<li><a href="../lit-notes/races/Super-Collider" class="internal alias" data-slug="lit-notes/races/Super-Collider">Super Collider</a> works seamlessly across kernels, GPUs, and processes <em>because</em> it is completely stateless. It does not need to coordinate shadow metadata between processes; it simply reads the shared memory address twice with a delay.</li>
+<li><em>Open Idea for the Project:</em> Could we implement SuperCollider’s redundant-read and nanosleep perturbation <em>dynamically</em> via NVBit instead of through a compiler pass?
+<ul>
+<li>If we inject weak read duplication and <code>nanosleep</code> directly at SASS level, we could get cross-process race detection without recompilation and with 0% metadata overhead.</li>
+<li>The trade-off would be instrumentation overhead and register pressure, but it avoids the entire IPC metadata sharing nightmare.</li>
+</ul>
+</li>
+</ul></article><hr/><div class="page-footer"></div></div><div class="right sidebar"><div class="graph"><h3>Graph View</h3><div class="graph-outer"><div class="graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:1,&quot;scale&quot;:1.1,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.3,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:false,&quot;enableRadial&quot;:false}"></div><button class="global-graph-icon" aria-label="Global Graph"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 55 55" fill="currentColor" xml:space="preserve"><path d="M49,0c-3.309,0-6,2.691-6,6c0,1.035,0.263,2.009,0.726,2.86l-9.829,9.829C32.542,17.634,30.846,17,29,17
+                s-3.542,0.634-4.898,1.688l-7.669-7.669C16.785,10.424,17,9.74,17,9c0-2.206-1.794-4-4-4S9,6.794,9,9s1.794,4,4,4
+                c0.74,0,1.424-0.215,2.019-0.567l7.669,7.669C21.634,21.458,21,23.154,21,25s0.634,3.542,1.688,4.897L10.024,42.562
+                C8.958,41.595,7.549,41,6,41c-3.309,0-6,2.691-6,6s2.691,6,6,6s6-2.691,6-6c0-1.035-0.263-2.009-0.726-2.86l12.829-12.829
+                c1.106,0.86,2.44,1.436,3.898,1.619v10.16c-2.833,0.478-5,2.942-5,5.91c0,3.309,2.691,6,6,6s6-2.691,6-6c0-2.967-2.167-5.431-5-5.91
+                v-10.16c1.458-0.183,2.792-0.759,3.898-1.619l7.669,7.669C41.215,39.576,41,40.26,41,41c0,2.206,1.794,4,4,4s4-1.794,4-4
+                s-1.794-4-4-4c-0.74,0-1.424,0.215-2.019,0.567l-7.669-7.669C36.366,28.542,37,26.846,37,25s-0.634-3.542-1.688-4.897l9.665-9.665
+                C46.042,11.405,47.451,12,49,12c3.309,0,6-2.691,6-6S52.309,0,49,0z M11,9c0-1.103,0.897-2,2-2s2,0.897,2,2s-0.897,2-2,2
+                S11,10.103,11,9z M6,51c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S8.206,51,6,51z M33,49c0,2.206-1.794,4-4,4s-4-1.794-4-4
+                s1.794-4,4-4S33,46.794,33,49z M29,31c-3.309,0-6-2.691-6-6s2.691-6,6-6s6,2.691,6,6S32.309,31,29,31z M47,41c0,1.103-0.897,2-2,2
+                s-2-0.897-2-2s0.897-2,2-2S47,39.897,47,41z M49,10c-2.206,0-4-1.794-4-4s1.794-4,4-4s4,1.794,4,4S51.206,10,49,10z"></path></svg></button></div><div class="global-graph-outer"><div class="global-graph-container" data-cfg="{&quot;drag&quot;:true,&quot;zoom&quot;:true,&quot;depth&quot;:-1,&quot;scale&quot;:0.9,&quot;repelForce&quot;:0.5,&quot;centerForce&quot;:0.2,&quot;linkDistance&quot;:30,&quot;fontSize&quot;:0.6,&quot;opacityScale&quot;:1,&quot;showTags&quot;:true,&quot;removeTags&quot;:[],&quot;focusOnHover&quot;:true,&quot;enableRadial&quot;:true}"></div></div></div><div class="toc desktop-only"><button type="button" class="toc-header" aria-controls="toc-17" aria-expanded="true"><h3>Table of Contents</h3><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="fold"><polyline points="6 9 12 15 18 9"></polyline></svg></button><ul id="list-1" class="toc-content overflow"><li class="depth-0"><a href="#recap" data-for="recap">Recap</a></li><li class="depth-0"><a href="#how-to-categorize-data-race-detectors" data-for="how-to-categorize-data-race-detectors">How to Categorize Data-Race Detectors</a></li><li class="depth-1"><a href="#1-instrumentation-level-where-is-the-code-patched" data-for="1-instrumentation-level-where-is-the-code-patched">1. Instrumentation Level (Where is the code patched?)</a></li><li class="depth-1"><a href="#2-core-detection-logic-how-are-races-identified" data-for="2-core-detection-logic-how-are-races-identified">2. Core Detection Logic (How are races identified?)</a></li><li class="depth-1"><a href="#3-metadata-md-footprint--management-how-heavy-is-the-state" data-for="3-metadata-md-footprint--management-how-heavy-is-the-state">3. Metadata (MD) Footprint &amp; Management (How heavy is the state?)</a></li><li class="depth-1"><a href="#4-gpu-architecture--concurrency-support" data-for="4-gpu-architecture--concurrency-support">4. GPU Architecture &amp; Concurrency Support</a></li><li class="depth-0"><a href="#comparison-table" data-for="comparison-table">Comparison Table</a></li><li class="depth-0"><a href="#gpu-concurrency--feature-matrix" data-for="gpu-concurrency--feature-matrix">GPU Concurrency &amp; Feature Matrix</a></li><li class="depth-0"><a href="#key-insights-for-inter-process-race-detection-my-research" data-for="key-insights-for-inter-process-race-detection-my-research">Key Insights for Inter-Process Race Detection (My Research)</a></li><li class="depth-1"><a href="#1-the-recompilation-bottleneck" data-for="1-the-recompilation-bottleneck">1. The Recompilation Bottleneck</a></li><li class="depth-1"><a href="#2-the-metadata-problem-across-process-boundaries" data-for="2-the-metadata-problem-across-process-boundaries">2. The Metadata Problem Across Process Boundaries</a></li><li class="depth-1"><a href="#3-can-we-borrow-stateless-value-sampling-dynamically" data-for="3-can-we-borrow-stateless-value-sampling-dynamically">3. Can We Borrow Stateless Value-Sampling Dynamically?</a></li><li class="overflow-end"></li></ul></div></div><footer class><p>Created with <a href="https://quartz.jzhao.xyz/">Quartz v4.5.2</a> © 2026</p><ul><li><a href="https://github.com/jackyzha0/quartz">GitHub</a></li><li><a href="https://discord.gg/cRFFHYye7t">Discord Community</a></li></ul></footer></div></div></body><script type="application/javascript" data-persist="true">function n(){let t=this.parentElement;t.classList.toggle("is-collapsed");let e=t.getElementsByClassName("callout-content")[0];if(!e)return;let l=t.classList.contains("is-collapsed");e.style.gridTemplateRows=l?"0fr":"1fr"}function c(){let t=document.getElementsByClassName("callout is-collapsible");for(let e of t){let l=e.getElementsByClassName("callout-title")[0],s=e.getElementsByClassName("callout-content")[0];if(!l||!s)continue;l.addEventListener("click",n),window.addCleanup(()=>l.removeEventListener("click",n));let o=e.classList.contains("is-collapsed");s.style.gridTemplateRows=o?"0fr":"1fr"}}document.addEventListener("nav",c);
+</script><script type="module" data-persist="true">function E(a,e){if(!a)return;function t(o){o.target===this&&(o.preventDefault(),o.stopPropagation(),e())}function n(o){o.key.startsWith("Esc")&&(o.preventDefault(),e())}a?.addEventListener("click",t),window.addCleanup(()=>a?.removeEventListener("click",t)),document.addEventListener("keydown",n),window.addCleanup(()=>document.removeEventListener("keydown",n))}function f(a){for(;a.firstChild;)a.removeChild(a.firstChild)}var m=class{constructor(e,t){this.container=e;this.content=t;this.setupEventListeners(),this.setupNavigationControls(),this.resetTransform()}isDragging=!1;startPan={x:0,y:0};currentPan={x:0,y:0};scale=1;MIN_SCALE=.5;MAX_SCALE=3;cleanups=[];setupEventListeners(){let e=this.onMouseDown.bind(this),t=this.onMouseMove.bind(this),n=this.onMouseUp.bind(this),o=this.onTouchStart.bind(this),r=this.onTouchMove.bind(this),i=this.onTouchEnd.bind(this),s=this.resetTransform.bind(this);this.container.addEventListener("mousedown",e),document.addEventListener("mousemove",t),document.addEventListener("mouseup",n),this.container.addEventListener("touchstart",o,{passive:!1}),document.addEventListener("touchmove",r,{passive:!1}),document.addEventListener("touchend",i),window.addEventListener("resize",s),this.cleanups.push(()=>this.container.removeEventListener("mousedown",e),()=>document.removeEventListener("mousemove",t),()=>document.removeEventListener("mouseup",n),()=>this.container.removeEventListener("touchstart",o),()=>document.removeEventListener("touchmove",r),()=>document.removeEventListener("touchend",i),()=>window.removeEventListener("resize",s))}cleanup(){for(let e of this.cleanups)e()}setupNavigationControls(){let e=document.createElement("div");e.className="mermaid-controls";let t=this.createButton("+",()=>this.zoom(.1)),n=this.createButton("-",()=>this.zoom(-.1)),o=this.createButton("Reset",()=>this.resetTransform());e.appendChild(n),e.appendChild(o),e.appendChild(t),this.container.appendChild(e)}createButton(e,t){let n=document.createElement("button");return n.textContent=e,n.className="mermaid-control-button",n.addEventListener("click",t),window.addCleanup(()=>n.removeEventListener("click",t)),n}onMouseDown(e){e.button===0&&(this.isDragging=!0,this.startPan={x:e.clientX-this.currentPan.x,y:e.clientY-this.currentPan.y},this.container.style.cursor="grabbing")}onMouseMove(e){this.isDragging&&(e.preventDefault(),this.currentPan={x:e.clientX-this.startPan.x,y:e.clientY-this.startPan.y},this.updateTransform())}onMouseUp(){this.isDragging=!1,this.container.style.cursor="grab"}onTouchStart(e){if(e.touches.length!==1)return;this.isDragging=!0;let t=e.touches[0];this.startPan={x:t.clientX-this.currentPan.x,y:t.clientY-this.currentPan.y}}onTouchMove(e){if(!this.isDragging||e.touches.length!==1)return;e.preventDefault();let t=e.touches[0];this.currentPan={x:t.clientX-this.startPan.x,y:t.clientY-this.startPan.y},this.updateTransform()}onTouchEnd(){this.isDragging=!1}zoom(e){let t=Math.min(Math.max(this.scale+e,this.MIN_SCALE),this.MAX_SCALE),n=this.content.getBoundingClientRect(),o=n.width/2,r=n.height/2,i=t-this.scale;this.currentPan.x-=o*i,this.currentPan.y-=r*i,this.scale=t,this.updateTransform()}updateTransform(){this.content.style.transform=`translate(${this.currentPan.x}px, ${this.currentPan.y}px) scale(${this.scale})`}resetTransform(){let t=this.content.querySelector("svg").getBoundingClientRect(),n=t.width/this.scale,o=t.height/this.scale;this.scale=1,this.currentPan={x:(this.container.clientWidth-n)/2,y:(this.container.clientHeight-o)/2},this.updateTransform()}},T=["--secondary","--tertiary","--gray","--light","--lightgray","--highlight","--dark","--darkgray","--codeFont"],y;document.addEventListener("nav",async()=>{let e=document.querySelector(".center").querySelectorAll("code.mermaid");if(e.length===0)return;y||=await import("https://cdnjs.cloudflare.com/ajax/libs/mermaid/11.4.0/mermaid.esm.min.mjs");let t=y.default,n=new WeakMap;for(let r of e)n.set(r,r.innerText);async function o(){for(let s of e){s.removeAttribute("data-processed");let c=n.get(s);c&&(s.innerHTML=c)}let r=T.reduce((s,c)=>(s[c]=window.getComputedStyle(document.documentElement).getPropertyValue(c),s),{}),i=document.documentElement.getAttribute("saved-theme")==="dark";t.initialize({startOnLoad:!1,securityLevel:"loose",theme:i?"dark":"base",themeVariables:{fontFamily:r["--codeFont"],primaryColor:r["--light"],primaryTextColor:r["--darkgray"],primaryBorderColor:r["--tertiary"],lineColor:r["--darkgray"],secondaryColor:r["--secondary"],tertiaryColor:r["--tertiary"],clusterBkg:r["--light"],edgeLabelBackground:r["--highlight"]}}),await t.run({nodes:e})}await o(),document.addEventListener("themechange",o),window.addCleanup(()=>document.removeEventListener("themechange",o));for(let r=0;r<e.length;r++){let v=function(){let g=l.querySelector("#mermaid-space"),h=l.querySelector(".mermaid-content");if(!h)return;f(h);let w=i.querySelector("svg").cloneNode(!0);h.appendChild(w),l.classList.add("active"),g.style.cursor="grab",u=new m(g,h)},M=function(){l.classList.remove("active"),u?.cleanup(),u=null},i=e[r],s=i.parentElement,c=s.querySelector(".clipboard-button"),d=s.querySelector(".expand-button"),p=window.getComputedStyle(c),L=c.offsetWidth+parseFloat(p.marginLeft||"0")+parseFloat(p.marginRight||"0");d.style.right=`calc(${L}px + 0.3rem)`,s.prepend(d);let l=s.querySelector("#mermaid-container");if(!l)return;let u=null;d.addEventListener("click",v),E(l,M),window.addCleanup(()=>{u?.cleanup(),d.removeEventListener("click",v)})}});
+</script><script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/copy-tex.min.js" type="application/javascript" data-persist="true"></script><script src="../postscript.js" type="module" data-persist="true"></script></html>
