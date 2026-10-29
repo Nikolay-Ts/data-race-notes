@@ -1,4 +1,8 @@
 
+#data-race #CPU
+
+[[eraser]]
+
 ## Introduction
 
 This software is to create a tool that can dynamically check for race conditions. It is based on Lamport's *happens-before relation* which checks that conflicting memory accesses from diff. threads are separated by a synchronisation event. Eraser checks that threads follow a consistent *locking discipline*. A discipline is a programming policy to ensure no races (the simplest one being a mutex). 

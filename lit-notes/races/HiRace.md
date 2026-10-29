@@ -17,7 +17,7 @@ Correctness: Having a state-machine allows the development of a Murphi formal re
 
 ## Methodology 
 
-The design is based around the built-in sync primitives in GPUs (e.g `__syncthreads`) as opposed to focusing on the full generality of CPU parallel programming patterns. The methods do not preclude the handling of fine-grained thread sync, but focus on optimizing the most common and impact forms of thread communication in GPUs. 
+The design is based around the built-in sync primitives in GPUs (e.g `__syncthreads`) as opposed to focusing on the full generality of GPU parallel programming patterns. The methods do not preclude the handling of fine-grained thread sync, but focus on optimizing the most common and impact forms of thread communication in GPUs. 
 
 All of the relating possible thread access histories to a single mem location. For example, if a thread reads the same mem location multiple times, we do not need to record each access separately. A single thread ID and a flag indicating a read by that ID is enough. Even more, in a program with only two threads, if both reads concurrently read the same me location, it suffices to only track the ID of either accessor along with the flag identifying the multiple threads have read it. 
 
@@ -63,6 +63,5 @@ __global__ void racy(int *data, int n) {
 	}
 }
 ```
-
 
 - [ ] finish reading this paper as well 

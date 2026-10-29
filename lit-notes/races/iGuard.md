@@ -92,7 +92,7 @@ This is done because without the `__syncwarp`, the first thread may move on and 
 
 - [ ] Finish reading this sections🔼 
 
-## Design Overview of iGuard\
+## Design Overview of iGuard
 
 #### In-GPU Race Detection
 

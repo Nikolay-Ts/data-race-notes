@@ -1,4 +1,8 @@
 
+#data-race #GPU 
+
+[[asplos21_predatar]]
+
 ## Introduction
 
 Modern GPUs now also support fin-grained inter-thread communication. synchronizing these using CUDA is becoming more difficult than on the CPU. Currently some methods are to use memory barriers and atomic operations with augmented scope to protect concurrent accesses of shared variables. 
